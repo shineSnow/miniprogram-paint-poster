@@ -1,6 +1,5 @@
 
-// import Taro from "@tarojs/taro";
-import Taro from "@tarojs/taro"
+import Taro from "@tarojs/taro";
 
 
 class FreePoster {
