@@ -1,8 +1,9 @@
 
-import Taro from "@tarojs/taro";
 
 
 class FreePoster {
+
+
   /**
    * 初始化canvas
    * @param options
@@ -16,10 +17,12 @@ class FreePoster {
       quality:1,
       canvasId:'posterCanvasId',
       debug:false,
+      globalEnv:null,
       canvasBackground:'rgba(0, 0, 0, 0.1)'
     };
-    this.params = Object.assign(obj,options)
-    this.canvasContext = Taro.createCanvasContext(this.params.canvasId);
+    this.params = Object.assign(obj,options);
+    this.GLOBAL_ENV= this.params.globalEnv;
+    this.canvasContext = this.GLOBAL_ENV.createCanvasContext(this.params.canvasId);
     this.posterImgSrc="";
   }
 
@@ -311,7 +314,7 @@ class FreePoster {
     console.log('预览海报,海报临时地址:',this.posterImgSrc);
     return new Promise((resolve,reject) =>{
       if(this.posterImgSrc){
-        Taro.previewImage({
+        this.GLOBAL_ENV.previewImage({
           current: this.posterImgSrc, // 当前显示图片的http链接
           urls: [this.posterImgSrc] // 需要预览的图片http链接列表
         }).then(() =>{
@@ -338,10 +341,9 @@ class FreePoster {
     //保存相册授权后方可执行
     // app.checkAuthorize("scope.writePhotosAlbum").then(res => {
     return new Promise((resoleve, reject) => {
-      Taro.saveImageToPhotosAlbum({
+      this.GLOBAL_ENV.saveImageToPhotosAlbum({
         filePath: src,
         success() {
-          Taro.hideToast()
           resoleve('图片保存到相册')
           console.log('成功保存图片到相册', src)
           if (self.params.debug) { console.timeEnd("canvas图片保存") }
@@ -349,7 +351,7 @@ class FreePoster {
         fail: function (err) {
           console.log(333, err)
           // if (err.errMsg == "saveImageToPhotosAlbum:fail authorize no response" || err.errMsg == "saveImageToPhotosAlbum:fail:auth denied" || err.errMsg == "saveImageToPhotosAlbum:fail auth deny") {
-          Taro.hideLoading()
+          this.GLOBAL_ENV.hideLoading()
           console.log(444, err)
           self.getAuth()
           // }
@@ -363,21 +365,21 @@ class FreePoster {
    * 获取授权
    */
   getAuth() {
-    Taro.hideLoading()
+    this.GLOBAL_ENV.hideLoading()
     if (this.params.debug) { console.log('拒绝保存') }
     // 这边微信做过调整，必须要在按钮中触发，因此需要在弹框回调中进行调用
-    Taro.showModal({
+    this.GLOBAL_ENV.showModal({
       content: '需要您授权保存相册',
       confirmColor: "#E23A4E",
       showCancel: false,
       success: modalSuccess => {
-        Taro.openSetting({
+        this.GLOBAL_ENV.openSetting({
           success(settingdata) {
             console.log("settingdata", settingdata)
             if (settingdata.authSetting['scope.writePhotosAlbum']) {
-              Taro.showToast({ title: '获取权限成功,再次点击图片即可保存', icon: 'none', duration: 3000 })
+              this.GLOBAL_ENV.showToast({ title: '获取权限成功,再次点击图片即可保存', icon: 'none', duration: 3000 })
             } else {
-              Taro.showToast({ title: '获取权限失败，将无法保存到相册', icon: 'none', duration: 3000 })
+              this.GLOBAL_ENV.showToast({ title: '获取权限失败，将无法保存到相册', icon: 'none', duration: 3000 })
             }
           },
           fail(failData) {
@@ -409,7 +411,7 @@ class FreePoster {
 
     return new Promise(async (resolve,reject) =>{
       try {
-        const localSrc = await Taro.downloadFile({url:targetSrc});
+        const localSrc = await this.GLOBAL_ENV.downloadFile({url:targetSrc});
         if (this.params.debug) {
           console.log('网络图片下载成功', localSrc.tempFilePath);
           console.timeEnd('网络图片下载时间',targetSrc);
@@ -439,7 +441,7 @@ class FreePoster {
         setTimeout(async () =>{
         try {
           if (this.params.debug){ console.log('开始截取canvas目前的图像');console.time("canvas截取图片")}
-          const res = await Taro.canvasToTempFilePath({
+          const res = await this.GLOBAL_ENV.canvasToTempFilePath({
             x: 0,
             y: 0,
             quality: this.params.quality,
