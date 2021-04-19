@@ -18,12 +18,12 @@ module.exports = {
   optimization:{
     minimize:true,
     minimizer:[
-      new UglifyJsPlugin({
-        include: /\.min\.js$/,
-    }),
-  //   new TerserPlugin({ // 使用压缩插件
-  //     include: /\.min\.js$/
-  // })
+    //   new UglifyJsPlugin({
+    //     include: /\.min\.js$/,
+    // }),
+    new TerserPlugin({ // 使用压缩插件
+      include: /\.min\.js$/
+    })
     ]
   },
 
