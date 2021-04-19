@@ -2,19 +2,18 @@ const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin') // 引入压缩插件
 module.exports = {
-  mode: 'none',
-  externals:{
-    "@tarojs/taro":'Taro'
-  },
+  mode: 'production',
+  // externals:{
+  //   "@tarojs/taro":'Taro'
+  // },
   entry: {
     freePoster:path.join(__dirname, 'src', 'index'),
     'freePoster.min':path.join(__dirname, 'src', 'index')
   },
   output: {
     filename: "[name].js",
-    libraryExport:"default",
-    library:"FreePoster",
-    libraryTarget:'umd'
+    libraryExport: "default",
+    libraryTarget: "umd",// var this window ...
   },
   optimization:{
     minimize:true,
