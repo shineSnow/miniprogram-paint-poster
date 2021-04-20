@@ -779,7 +779,6 @@ var FreePoster = /*#__PURE__*/function () {
                     fail: function fail(err) {
                       console.log(333, err); // if (err.errMsg == "saveImageToPhotosAlbum:fail authorize no response" || err.errMsg == "saveImageToPhotosAlbum:fail:auth denied" || err.errMsg == "saveImageToPhotosAlbum:fail auth deny") {
 
-                      this.GLOBAL_ENV.hideLoading();
                       console.log(444, err);
                       self.getAuth(); // }
 
