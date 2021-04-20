@@ -17,7 +17,7 @@ class FreePoster {
       quality:1,
       canvasId:'posterCanvasId',
       debug:false,
-      globalEnv:null,
+      globalEnv:window.wx,
       canvasBackground:'rgba(0, 0, 0, 0.1)'
     };
     this.params = Object.assign(obj,options);
@@ -344,6 +344,7 @@ class FreePoster {
       this.GLOBAL_ENV.saveImageToPhotosAlbum({
         filePath: src,
         success() {
+          self.GLOBAL_ENV.hideToast()
           resoleve('图片保存到相册')
           console.log('成功保存图片到相册', src)
           if (self.params.debug) { console.timeEnd("canvas图片保存") }
@@ -351,6 +352,7 @@ class FreePoster {
         fail: function (err) {
           console.log(333, err)
           // if (err.errMsg == "saveImageToPhotosAlbum:fail authorize no response" || err.errMsg == "saveImageToPhotosAlbum:fail:auth denied" || err.errMsg == "saveImageToPhotosAlbum:fail auth deny") {
+          self.GLOBAL_ENV.hideLoading()
           console.log(444, err)
           self.getAuth()
           // }
@@ -364,6 +366,7 @@ class FreePoster {
    * 获取授权
    */
   getAuth() {
+    const self = this;
     this.GLOBAL_ENV.hideLoading()
     if (this.params.debug) { console.log('拒绝保存') }
     // 这边微信做过调整，必须要在按钮中触发，因此需要在弹框回调中进行调用
@@ -376,9 +379,9 @@ class FreePoster {
           success(settingdata) {
             console.log("settingdata", settingdata)
             if (settingdata.authSetting['scope.writePhotosAlbum']) {
-              this.GLOBAL_ENV.showToast({ title: '获取权限成功,再次点击图片即可保存', icon: 'none', duration: 3000 })
+              self.GLOBAL_ENV.showToast({ title: '获取权限成功,再次点击图片即可保存', icon: 'none', duration: 3000 })
             } else {
-              this.GLOBAL_ENV.showToast({ title: '获取权限失败，将无法保存到相册', icon: 'none', duration: 3000 })
+              self.GLOBAL_ENV.showToast({ title: '获取权限失败，将无法保存到相册', icon: 'none', duration: 3000 })
             }
           },
           fail(failData) {
