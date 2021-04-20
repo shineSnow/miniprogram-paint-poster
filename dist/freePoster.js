@@ -245,7 +245,7 @@ var FreePoster = /*#__PURE__*/function () {
       quality: 1,
       canvasId: 'posterCanvasId',
       debug: false,
-      globalEnv: null,
+      globalEnv: window.wx,
       canvasBackground: 'rgba(0, 0, 0, 0.1)'
     };
     this.params = Object.assign(obj, options);
@@ -769,6 +769,7 @@ var FreePoster = /*#__PURE__*/function () {
                   _this3.GLOBAL_ENV.saveImageToPhotosAlbum({
                     filePath: src,
                     success: function success() {
+                      self.GLOBAL_ENV.hideToast();
                       resoleve('图片保存到相册');
                       console.log('成功保存图片到相册', src);
 
@@ -779,6 +780,7 @@ var FreePoster = /*#__PURE__*/function () {
                     fail: function fail(err) {
                       console.log(333, err); // if (err.errMsg == "saveImageToPhotosAlbum:fail authorize no response" || err.errMsg == "saveImageToPhotosAlbum:fail:auth denied" || err.errMsg == "saveImageToPhotosAlbum:fail auth deny") {
 
+                      self.GLOBAL_ENV.hideLoading();
                       console.log(444, err);
                       self.getAuth(); // }
 
@@ -810,6 +812,7 @@ var FreePoster = /*#__PURE__*/function () {
     value: function getAuth() {
       var _this4 = this;
 
+      var self = this;
       this.GLOBAL_ENV.hideLoading();
 
       if (this.params.debug) {
@@ -827,13 +830,13 @@ var FreePoster = /*#__PURE__*/function () {
               console.log("settingdata", settingdata);
 
               if (settingdata.authSetting['scope.writePhotosAlbum']) {
-                this.GLOBAL_ENV.showToast({
+                self.GLOBAL_ENV.showToast({
                   title: '获取权限成功,再次点击图片即可保存',
                   icon: 'none',
                   duration: 3000
                 });
               } else {
-                this.GLOBAL_ENV.showToast({
+                self.GLOBAL_ENV.showToast({
                   title: '获取权限失败，将无法保存到相册',
                   icon: 'none',
                   duration: 3000

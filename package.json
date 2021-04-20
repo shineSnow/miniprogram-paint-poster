@@ -8,6 +8,7 @@
         "build": "webpack"
     },
     "keywords": [
+        "Taro",
         "小程序",
         "海报",
         "poster"
@@ -24,7 +25,6 @@
         "webpack-cli": "^3.3.12"
     },
     "dependencies": {
-        "@babel/runtime": "^7.7.7",
-        "react": "^16.10.0"
+        "@babel/runtime": "^7.7.7"
     }
 }
