@@ -3,7 +3,7 @@
 <p align="center"><a href="#" target="_blank" rel="noopener noreferrer"><img width="550"
                                                                              src="./src/npm-logo.png"
                                                                              alt="Day.js"></a></p>
-<p align="center">miniprogram-paint-poster.js 的 <b>2kB</b> 轻量化方案，拥有同样强大的 API</p>
+<p align="center">miniprogram-paint-poster.js 的 <b>18.4kB</b> 方案，拥有同样强大绘图的 API</p>
 <br>
 <p align="center">
     <a href="https://unpkg.com/dayjs/dist/dayjs.min.js"><img
