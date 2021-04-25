@@ -24,6 +24,9 @@
 
 
 ---
+[TOC]
+
+---
 
 ## 安装
 
@@ -184,16 +187,11 @@ return(
 export default sharePage;
 ```
 
-<!-- ![canvas-demo](./src/canvas-demo.png) -->
+#### 示例图片
+![canvas-demo](./src/canvas-demo.png)
 
 
 ## API
-
-* [初始化](#初始化)
-* [绘制cavans背景色](#绘制cavans背景色)
-* [预览绘制的海报图](#预览绘制的海报图)
-* [保存海报图到本地](#保存海报图到本地)
-
 
 ### 初始化
 new FreePoster(params)构造函数的默认字段:
