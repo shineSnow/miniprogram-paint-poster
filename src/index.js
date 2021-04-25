@@ -1,9 +1,4 @@
-
-
-
 class FreePoster {
-
-
   /**
    * 初始化canvas
    * @param options
@@ -18,12 +13,27 @@ class FreePoster {
       canvasId:'posterCanvasId',
       debug:false,
       globalEnv:window.wx,
-      canvasBackground:'rgba(0, 0, 0, 0.1)'
     };
     this.params = Object.assign(obj,options);
     this.GLOBAL_ENV= this.params.globalEnv;
     this.canvasContext = this.GLOBAL_ENV.createCanvasContext(this.params.canvasId);
     this.posterImgSrc="";
+  }
+
+  /**
+   * canvas绘制背景色
+   */
+  setCanvasBackground(canvasBackground) {
+    if(canvasBackground) {
+      let color = canvasBackground;
+      const {width,height} = this.params;
+      if (this.params.debug) console.log('canvas的背景色为：',color);
+      this.canvasContext.save()
+      this.canvasContext.setFillStyle(color);
+      this.canvasContext.fillRect(0, 0, width, height)
+      this.canvasContext.restore();
+      this.canvasContext.draw(true);
+    }
   }
 
   /**
@@ -92,6 +102,36 @@ class FreePoster {
     this.canvasContext.draw(true)
   }
 
+  /**
+   * canvas绘制圆角矩形图片
+   * @param imgInfo.x  矩形左上角的横坐标（非圆角矩形时左上角横坐标）。
+   * @param imgInfo.y  矩形左上角的纵坐标（非圆角矩形时左上角纵坐标）。
+   * @param imgInfo.width  矩形的宽度。
+   * @param imgInfo.height  矩形的高度。
+   * @param imgInfo.r  圆角所处圆的半径尺寸。理解上面自定义方法的关键在于对它所用到方法的理解
+   * @param imgInfo.src  图片地址
+   * @returns {Promise<void>}
+   */
+  async paintRadiusImage(imgInfo) {
+    if (this.params.debug) console.log('开始圆角矩形图片', imgInfo);
+    const {x,y,width,height,r,src} = imgInfo
+    let circleR = r;
+    const newSrc = await this._downloadFile(src);
+    if (width< 2 * r) circleR = width / 2;
+    if (height < 2 * r) circleR = height / 2;
+    this.canvasContext.save();
+    this.canvasContext.beginPath()
+    this.canvasContext.moveTo(x + circleR, y);
+    this.canvasContext.arcTo(x + width, y, x + width, y + height, circleR);
+    this.canvasContext.arcTo(x + width, y + height, x, y + height, circleR);
+    this.canvasContext.arcTo(x, y + height, x, y, circleR);
+    this.canvasContext.arcTo(x, y, x + width, y, circleR);
+    this.canvasContext.clip()
+    this.canvasContext.drawImage(newSrc, x, y, width, height);
+    this.canvasContext.restore();
+    this.canvasContext.draw(true);
+  }
+
 
   /**
    * 绘制圆形形状
@@ -141,6 +181,7 @@ class FreePoster {
    * @param textInfo.y:文本y坐标
    * @param textInfo.fontSize:文字字体大小
    * @param textInfo.color:文本颜色
+   * @param textInfo.txt:文本
    * @param textInfo.MaxTextNum:最多多少文字，超过这个范围截取文字并且用。。。代替
    * @param textInfo.font:设置字体所有的属性，如果有front,则覆盖现有的字体大小，颜色。（font-style, font-variant, font-weight, font-size, line-height 和 font-family ）
    */
@@ -175,19 +216,17 @@ class FreePoster {
   /**
    * canvas绘制带环形文字居中
    * @param textInfo.txt 文字
-   * @param textInfo.x
-   * @param textInfo.y
    * @param textInfo.fontSize  字体大小
    * @param textInfo.color  字体颜色
    * @param textInfo.circularH 环形的高度
    * @param textInfo.circularW 环形额宽度
    * @param textInfo.circularColor 环形的背景色
    * @param textInfo.circularY 环形的y坐标
-   * @param textInfo
+   * @param textInfo.circularX 环形的x坐标
    */
   paintCircularText(textInfo) {
     if (this.params.debug) console.log('开始绘制环形文字', textInfo);
-    const {txt,x,y,fontSize,color,circularH,circularW,circularColor,circularY} = textInfo;
+    const {txt,fontSize,color,circularH,circularW,circularColor,circularY,circularX} = textInfo;
     // let circularW=''
     let txtWidth =  this.canvasContext.measureText(txt).width;
     // let circularW = txtWidth + 300;
@@ -196,7 +235,7 @@ class FreePoster {
     // if(txtWidth >= 30 && txtWidth < 60) {circularW = txtWidth + 160}
     // if(txtWidth >= 60 && txtWidth < 200) {circularW = txtWidth + 360}
 
-    let circularX = (this.params.width - circularW)/2;
+    // let circularX = (this.params.width - circularW)/2;
     if (this.params.debug) console.log("环形文字的宽度--"+txt, txtWidth);
     if (this.params.debug) console.log('环形的宽度', circularW);
     let halfCircularH = circularH/2;
@@ -394,7 +433,6 @@ class FreePoster {
       }
     })
   }
-
 
   /**
    * 下载网络图片到本地
