@@ -1,4 +1,5 @@
 class FreePoster {
+  
   /**
    * 初始化canvas
    * @param options
