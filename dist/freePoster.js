@@ -245,8 +245,7 @@ var FreePoster = /*#__PURE__*/function () {
       quality: 1,
       canvasId: 'posterCanvasId',
       debug: false,
-      globalEnv: window.wx,
-      canvasBackground: 'rgba(0, 0, 0, 0.1)'
+      globalEnv: window.wx
     };
     this.params = Object.assign(obj, options);
     this.GLOBAL_ENV = this.params.globalEnv;
@@ -254,16 +253,36 @@ var FreePoster = /*#__PURE__*/function () {
     this.posterImgSrc = "";
   }
   /**
-   * 默认绘制矩形图片
-   * @param src 图片地址
-   * @param x  相对canvas左上角的x坐标
-   * @param y  相对canvas左上角的y坐标
-   * @param width   图片宽度
-   * @param height   图片高度
+   * canvas绘制背景色
    */
 
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(FreePoster, [{
+    key: "setCanvasBackground",
+    value: function setCanvasBackground(canvasBackground) {
+      if (canvasBackground) {
+        var color = canvasBackground;
+        var _this$params = this.params,
+            width = _this$params.width,
+            height = _this$params.height;
+        if (this.params.debug) console.log('canvas的背景色为：', color);
+        this.canvasContext.save();
+        this.canvasContext.setFillStyle(color);
+        this.canvasContext.fillRect(0, 0, width, height);
+        this.canvasContext.restore();
+        this.canvasContext.draw(true);
+      }
+    }
+    /**
+     * 默认绘制矩形图片
+     * @param src 图片地址
+     * @param x  相对canvas左上角的x坐标
+     * @param y  相对canvas左上角的y坐标
+     * @param width   图片宽度
+     * @param height   图片高度
+     */
+
+  }, {
     key: "paintImg",
     value: function () {
       var _paintImg = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee(imgInfo) {
@@ -414,6 +433,62 @@ var FreePoster = /*#__PURE__*/function () {
       return paintCircleImage;
     }()
     /**
+     * canvas绘制圆角矩形图片
+     * @param imgInfo.x  矩形左上角的横坐标（非圆角矩形时左上角横坐标）。
+     * @param imgInfo.y  矩形左上角的纵坐标（非圆角矩形时左上角纵坐标）。
+     * @param imgInfo.width  矩形的宽度。
+     * @param imgInfo.height  矩形的高度。
+     * @param imgInfo.r  圆角所处圆的半径尺寸。理解上面自定义方法的关键在于对它所用到方法的理解
+     * @param imgInfo.src  图片地址
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: "paintRadiusImage",
+    value: function () {
+      var _paintRadiusImage = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee4(imgInfo) {
+        var x, y, width, height, r, src, circleR, newSrc;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                if (this.params.debug) console.log('开始圆角矩形图片', imgInfo);
+                x = imgInfo.x, y = imgInfo.y, width = imgInfo.width, height = imgInfo.height, r = imgInfo.r, src = imgInfo.src;
+                circleR = r;
+                _context4.next = 5;
+                return this._downloadFile(src);
+
+              case 5:
+                newSrc = _context4.sent;
+                if (width < 2 * r) circleR = width / 2;
+                if (height < 2 * r) circleR = height / 2;
+                this.canvasContext.save();
+                this.canvasContext.beginPath();
+                this.canvasContext.moveTo(x + circleR, y);
+                this.canvasContext.arcTo(x + width, y, x + width, y + height, circleR);
+                this.canvasContext.arcTo(x + width, y + height, x, y + height, circleR);
+                this.canvasContext.arcTo(x, y + height, x, y, circleR);
+                this.canvasContext.arcTo(x, y, x + width, y, circleR);
+                this.canvasContext.clip();
+                this.canvasContext.drawImage(newSrc, x, y, width, height);
+                this.canvasContext.restore();
+                this.canvasContext.draw(true);
+
+              case 19:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function paintRadiusImage(_x4) {
+        return _paintRadiusImage.apply(this, arguments);
+      }
+
+      return paintRadiusImage;
+    }()
+    /**
      * 绘制圆形形状
      * @param shapeInfo.x 矩形左上角x坐标
      * @param shapeInfo.y 矩形左上角y坐标
@@ -472,6 +547,7 @@ var FreePoster = /*#__PURE__*/function () {
      * @param textInfo.y:文本y坐标
      * @param textInfo.fontSize:文字字体大小
      * @param textInfo.color:文本颜色
+     * @param textInfo.txt:文本
      * @param textInfo.MaxTextNum:最多多少文字，超过这个范围截取文字并且用。。。代替
      * @param textInfo.font:设置字体所有的属性，如果有front,则覆盖现有的字体大小，颜色。（font-style, font-variant, font-weight, font-size, line-height 和 font-family ）
      */
@@ -517,15 +593,13 @@ var FreePoster = /*#__PURE__*/function () {
     /**
      * canvas绘制带环形文字居中
      * @param textInfo.txt 文字
-     * @param textInfo.x
-     * @param textInfo.y
      * @param textInfo.fontSize  字体大小
      * @param textInfo.color  字体颜色
      * @param textInfo.circularH 环形的高度
      * @param textInfo.circularW 环形额宽度
      * @param textInfo.circularColor 环形的背景色
      * @param textInfo.circularY 环形的y坐标
-     * @param textInfo
+     * @param textInfo.circularX 环形的x坐标
      */
 
   }, {
@@ -533,22 +607,21 @@ var FreePoster = /*#__PURE__*/function () {
     value: function paintCircularText(textInfo) {
       if (this.params.debug) console.log('开始绘制环形文字', textInfo);
       var txt = textInfo.txt,
-          x = textInfo.x,
-          y = textInfo.y,
           fontSize = textInfo.fontSize,
           color = textInfo.color,
           circularH = textInfo.circularH,
           circularW = textInfo.circularW,
           circularColor = textInfo.circularColor,
-          circularY = textInfo.circularY; // let circularW=''
+          circularY = textInfo.circularY,
+          circularX = textInfo.circularX; // let circularW=''
 
       var txtWidth = this.canvasContext.measureText(txt).width; // let circularW = txtWidth + 300;
       // let circularW = txtWidth*6;
       // if(txtWidth < 30) {circularW = txtWidth + 60}
       // if(txtWidth >= 30 && txtWidth < 60) {circularW = txtWidth + 160}
       // if(txtWidth >= 60 && txtWidth < 200) {circularW = txtWidth + 360}
+      // let circularX = (this.params.width - circularW)/2;
 
-      var circularX = (this.params.width - circularW) / 2;
       if (this.params.debug) console.log("环形文字的宽度--" + txt, txtWidth);
       if (this.params.debug) console.log('环形的宽度', circularW);
       var halfCircularH = circularH / 2;
@@ -691,19 +764,19 @@ var FreePoster = /*#__PURE__*/function () {
   }, {
     key: "previewPoster",
     value: function () {
-      var _previewPoster = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee4() {
+      var _previewPoster = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee5() {
         var _this2 = this;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee4$(_context4) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context4.next = 2;
+                _context5.next = 2;
                 return this._canvasToTempFilePath();
 
               case 2:
                 console.log('预览海报,海报临时地址:', this.posterImgSrc);
-                return _context4.abrupt("return", new Promise(function (resolve, reject) {
+                return _context5.abrupt("return", new Promise(function (resolve, reject) {
                   if (_this2.posterImgSrc) {
                     _this2.GLOBAL_ENV.previewImage({
                       current: _this2.posterImgSrc,
@@ -723,10 +796,10 @@ var FreePoster = /*#__PURE__*/function () {
 
               case 4:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       function previewPoster() {
@@ -743,16 +816,16 @@ var FreePoster = /*#__PURE__*/function () {
   }, {
     key: "savePosterToPhoto",
     value: function () {
-      var _savePosterToPhoto = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee5() {
+      var _savePosterToPhoto = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee6() {
         var _this3 = this;
 
         var self, src;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee5$(_context5) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 self = this;
-                _context5.next = 3;
+                _context6.next = 3;
                 return this._canvasToTempFilePath();
 
               case 3:
@@ -765,7 +838,7 @@ var FreePoster = /*#__PURE__*/function () {
                 // app.checkAuthorize("scope.writePhotosAlbum").then(res => {
 
 
-                return _context5.abrupt("return", new Promise(function (resoleve, reject) {
+                return _context6.abrupt("return", new Promise(function (resoleve, reject) {
                   _this3.GLOBAL_ENV.saveImageToPhotosAlbum({
                     filePath: src,
                     success: function success() {
@@ -791,10 +864,10 @@ var FreePoster = /*#__PURE__*/function () {
 
               case 6:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
       function savePosterToPhoto() {
@@ -875,20 +948,20 @@ var FreePoster = /*#__PURE__*/function () {
       }
 
       return new Promise( /*#__PURE__*/function () {
-        var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee6(resolve, reject) {
+        var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee7(resolve, reject) {
           var localSrc;
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee6$(_context6) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee7$(_context7) {
             while (1) {
-              switch (_context6.prev = _context6.next) {
+              switch (_context7.prev = _context7.next) {
                 case 0:
-                  _context6.prev = 0;
-                  _context6.next = 3;
+                  _context7.prev = 0;
+                  _context7.next = 3;
                   return _this5.GLOBAL_ENV.downloadFile({
                     url: targetSrc
                   });
 
                 case 3:
-                  localSrc = _context6.sent;
+                  localSrc = _context7.sent;
 
                   if (_this5.params.debug) {
                     console.log('网络图片下载成功', localSrc.tempFilePath);
@@ -896,28 +969,28 @@ var FreePoster = /*#__PURE__*/function () {
                   }
 
                   resolve(localSrc.tempFilePath);
-                  _context6.next = 12;
+                  _context7.next = 12;
                   break;
 
                 case 8:
-                  _context6.prev = 8;
-                  _context6.t0 = _context6["catch"](0);
+                  _context7.prev = 8;
+                  _context7.t0 = _context7["catch"](0);
 
                   if (_this5.params.debug) {
                     console.log('网络图片下载失败');
                   }
 
-                  reject(_context6.t0);
+                  reject(_context7.t0);
 
                 case 12:
                 case "end":
-                  return _context6.stop();
+                  return _context7.stop();
               }
             }
-          }, _callee6, null, [[0, 8]]);
+          }, _callee7, null, [[0, 8]]);
         }));
 
-        return function (_x4, _x5) {
+        return function (_x5, _x6) {
           return _ref.apply(this, arguments);
         };
       }());
@@ -940,20 +1013,20 @@ var FreePoster = /*#__PURE__*/function () {
       }
 
       return new Promise(function (resolve, reject) {
-        setTimeout( /*#__PURE__*/_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee7() {
+        setTimeout( /*#__PURE__*/_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.mark(function _callee8() {
           var res;
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee7$(_context7) {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default.a.wrap(function _callee8$(_context8) {
             while (1) {
-              switch (_context7.prev = _context7.next) {
+              switch (_context8.prev = _context8.next) {
                 case 0:
-                  _context7.prev = 0;
+                  _context8.prev = 0;
 
                   if (_this6.params.debug) {
                     console.log('开始截取canvas目前的图像');
                     console.time("canvas截取图片");
                   }
 
-                  _context7.next = 4;
+                  _context8.next = 4;
                   return _this6.GLOBAL_ENV.canvasToTempFilePath({
                     x: 0,
                     y: 0,
@@ -962,7 +1035,7 @@ var FreePoster = /*#__PURE__*/function () {
                   });
 
                 case 4:
-                  res = _context7.sent;
+                  res = _context8.sent;
 
                   if (_this6.params.debug) {
                     console.log('截取canvas目前的图像成功', res.tempFilePath);
@@ -971,20 +1044,20 @@ var FreePoster = /*#__PURE__*/function () {
 
                   _this6.posterImgSrc = res.tempFilePath;
                   resolve();
-                  _context7.next = 13;
+                  _context8.next = 13;
                   break;
 
                 case 10:
-                  _context7.prev = 10;
-                  _context7.t0 = _context7["catch"](0);
-                  reject(_context7.t0);
+                  _context8.prev = 10;
+                  _context8.t0 = _context8["catch"](0);
+                  reject(_context8.t0);
 
                 case 13:
                 case "end":
-                  return _context7.stop();
+                  return _context8.stop();
               }
             }
-          }, _callee7, null, [[0, 10]]);
+          }, _callee8, null, [[0, 10]]);
         })), 300);
       });
     }
