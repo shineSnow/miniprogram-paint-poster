@@ -6,7 +6,7 @@
 </p>
 <p align="center">miniprogram-paint-poster.js 一个Taro小程序绘制海报图 <b>18.4kB</b> 的解决方案，拥有强大绘图的 API</p>
 <br>
-<p align="center">
+<!-- <p align="center">
     <a href="https://unpkg.com/dayjs/dist/dayjs.min.js"><img
             src="http://img.badgesize.io/https://unpkg.com/dayjs/dist/dayjs.min.js?compression=gzip&style=flat-square"
             alt="Gzip Size"></a>
@@ -18,7 +18,7 @@
             src="https://img.shields.io/codecov/c/github/xx45/dayjs/master.svg?style=flat-square" alt="Codecov"></a>
     <a href="https://github.com/xx45/dayjs/blob/master/LICENSE"><img
             src="https://img.shields.io/npm/l/dayjs.svg?style=flat-square" alt="License"></a>
-</p>
+</p> -->
 
 > miniprogram-paint-poster.js 是一个解决小程序端绘制海报图的vanvas库,基于promise,支持自定义canvas背景颜色,图片,支持绘制多种格式文字,多种样式图片,多种图形.你可以随意组合这几种元素构根据业务需要构建出复杂的canvas海报图.可以满足90%以上的业务需要了!
 
